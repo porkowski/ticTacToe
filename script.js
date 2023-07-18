@@ -1,14 +1,13 @@
-var gameBoard = (() => {
+function gameBoard() {
 
-    var board = ['X','O','X','O','O','O','X','X','X'];
-    
+    var board =[];
+  
     //cache DOM
     const $board = document.querySelector('.gameBoard');
     const $pieces = document.querySelectorAll('.boardPiece');
 
-    
-    //bind events
-    
+    //get Board so UI can render it later
+    const getBoard = () => board;
 
     // render();
     const render = function() {
@@ -18,18 +17,37 @@ var gameBoard = (() => {
     }
 
     render();
-    return {render, board};
-})();
+    return {$board, $pieces,getBoard};
+};
+
+
 
 var playerFactory = function(moniker) {
-//Grab all of gameBoard into playerFactory
 
+    const board = gameBoard();
 
-    return {moniker};
+    const play = (moniker) => {
+
+//GRAB INDEX OF BOX CLICKED
+const boardPieces= gameBoard().$pieces;
+const boardDom = gameBoard().$board;
+
+    const bPiecesArray = Array.from(boardPieces);
+
+    bPiecesArray.forEach(piece => piece.addEventListener("click", (event)=>{
+        const boxClicked = bPiecesArray.indexOf(event.target);
+        console.log(bPiecesArray.indexOf(event.target));
+    }))
+        
+ }
+
+    return {play, moniker};
 }
 
 const X = playerFactory('X');
 const Y = playerFactory('Y');
+
+X.play();
 
 //BELOW FROM tobyPlaysTheUke
 
