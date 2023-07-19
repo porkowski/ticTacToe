@@ -1,6 +1,7 @@
 function gameBoard() {
 
-    var board =[];
+    //board array to be 9 items (3x3 grid)
+    var board =['','','','','','','','',''];
   
     //cache DOM
     const $board = document.querySelector('.gameBoard');
@@ -9,45 +10,85 @@ function gameBoard() {
     //get Board so UI can render it later
     const getBoard = () => board;
 
-    // render();
+    // render() FROM ARRAY FUNCTION, MAY BE DELETED LATER;
     const render = function() {
         for (let i = 0; i < $pieces.length; i++) {
             $pieces[i].setAttribute("id",`${board[i]}`);
         }
     }
-
     render();
-    return {$board, $pieces,getBoard};
+
+
+    return {board, $board, $pieces,getBoard};
 };
+
+gameBoard();
+
 
 
 
 var playerFactory = function(moniker) {
 
-    const board = gameBoard();
+  
+    const boardArray = gameBoard().board;
+    viewBoard= () => boardArray;
 
-    const play = (moniker) => {
+    const playRound = (moniker) => {
 
-//GRAB INDEX OF BOX CLICKED
+//GRAB DOM ELEMENTS FROM gameBoard()
 const boardPieces= gameBoard().$pieces;
 const boardDom = gameBoard().$board;
 
     const bPiecesArray = Array.from(boardPieces);
 
-    bPiecesArray.forEach(piece => piece.addEventListener("click", (event)=>{
-        const boxClicked = bPiecesArray.indexOf(event.target);
-        console.log(bPiecesArray.indexOf(event.target));
-    }))
-        
+     boardDom.addEventListener("click", (event)=>{
+         const boxClickedIndex = bPiecesArray.indexOf(event.target);
+         const clickedDiv = boardPieces[boxClickedIndex];
+
+         //ONLY ADD 'X' OR 'O' IF THERE IS CURRENTLY NOBODY ON A BOX
+        if ((boardArray[boxClickedIndex]=='')) {
+         clickedDiv.setAttribute("id",moniker);
+         boardArray.splice(boxClickedIndex,1,moniker);
+         return boardArray;
+        };
+     
+    },{once:true});
+
  }
 
-    return {play, moniker};
+    return {playRound, moniker, viewBoard};
 }
 
 const X = playerFactory('X');
-const Y = playerFactory('Y');
+const O = playerFactory('O');
 
-X.play();
+
+
+const gameLogic = (() => {
+
+const {playRound} = playerFactory();
+
+const startGame = () => {
+    const board = viewBoard();
+    const filteredBoard = board.filter(box => box=="")
+    
+// Continue as long as there are more than 0 spaces available
+   if (filteredBoard.length>0) {
+    X.playRound('X');
+    }; 
+}
+
+
+
+startGame();
+
+})();
+
+
+
+//Create instances of X and O
+
+
 
 //BELOW FROM tobyPlaysTheUke
 
