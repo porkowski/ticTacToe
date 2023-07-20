@@ -1,4 +1,4 @@
-function gameBoard() {
+const gameBoard = (() => {
 
     //board array to be 9 items (3x3 grid)
     var board =['','','','','','','','',''];
@@ -7,56 +7,57 @@ function gameBoard() {
     const $board = document.querySelector('.gameBoard');
     const $pieces = document.querySelectorAll('.boardPiece');
 
-    //get Board so UI can render it later
+    //allow other factory function/module to inherit board
     const getBoard = () => board;
 
-    // render() FROM ARRAY FUNCTION, MAY BE DELETED LATER;
-    const render = function() {
-        for (let i = 0; i < $pieces.length; i++) {
-            $pieces[i].setAttribute("id",`${board[i]}`);
-        }
-    }
-    render();
+    // // render() FROM ARRAY FUNCTION, MAY BE DELETED LATER;
+    // const render = function() {
+    //     for (let i = 0; i < $pieces.length; i++) {
+    //         $pieces[i].setAttribute("id",`${board[i]}`);
+    //     }
+    // }
+    // render();
 
 
-    return {board, $board, $pieces,getBoard};
-};
+    return {getBoard, $board, $pieces,};
+})();;
 
-gameBoard();
 
 
 
 
 var playerFactory = function(moniker) {
 
-  
-    const boardArray = gameBoard().board;
-    viewBoard= () => boardArray;
+    //function to indicate that ones' turn is completed
+    const finishedTurn = () => {
+        console.log('firing finished');
+        gameLogic.nextPlayer();
+    }
 
     const playRound = (moniker) => {
+        let boardArray = gameBoard.getBoard();
+        //GRAB DOM ELEMENTS FROM gameBoard()
+        const boardPieces= gameBoard.$pieces;
+        const boardDom = gameBoard.$board;
+        var newArray = [];
+        //CONVERT NODELIST TO ARRAY TO USE ARRAY METHODS SUCH AS .indexOf
+        const bPiecesArray = Array.from(boardPieces);
 
-//GRAB DOM ELEMENTS FROM gameBoard()
-const boardPieces= gameBoard().$pieces;
-const boardDom = gameBoard().$board;
-
-    const bPiecesArray = Array.from(boardPieces);
-
-     boardDom.addEventListener("click", (event)=>{
-         const boxClickedIndex = bPiecesArray.indexOf(event.target);
-         const clickedDiv = boardPieces[boxClickedIndex];
-
-         //ONLY ADD 'X' OR 'O' IF THERE IS CURRENTLY NOBODY ON A BOX
-        if ((boardArray[boxClickedIndex]=='')) {
-         clickedDiv.setAttribute("id",moniker);
-         boardArray.splice(boxClickedIndex,1,moniker);
-         return boardArray;
-        };
-     
+        boardDom.addEventListener("click", (event)=>{
+           const boxClickedIndex = bPiecesArray.indexOf(event.target);
+           const clickedDiv = boardPieces[boxClickedIndex];
+            //ONLY ADD 'X' OR 'O' IF THERE IS CURRENTLY NOBODY ON A BOX
+           if ((boardArray[boxClickedIndex]=='')) {
+              clickedDiv.setAttribute("id",moniker);
+              boardArray.splice(boxClickedIndex,1,moniker);
+              finishedTurn();
+           return boardArray;
+           };
+           
     },{once:true});
-
  }
+    return {playRound, moniker};
 
-    return {playRound, moniker, viewBoard};
 }
 
 const X = playerFactory('X');
@@ -69,20 +70,38 @@ const gameLogic = (() => {
 const {playRound} = playerFactory();
 
 const startGame = () => {
-    const board = viewBoard();
-    const filteredBoard = board.filter(box => box=="")
-    
-// Continue as long as there are more than 0 spaces available
-   if (filteredBoard.length>0) {
+    // const board = gameBoard.getBoard();
+    // const filteredBoard = board.filter(box => box=="")
+
+    // const initialArray = board.toString();
+    // console.log(initialArray);
+    // console.log(board);
+ //Initially, X starts.
     X.playRound('X');
-    }; 
+
+//Then, the next player gets to pick a spot once an initial X is added
+
 }
 
-
-
+const nextPlayer = () => {
+O.playRound('O')
+//Alternate between O and X 
+// for (let i=1; i<10; i++) {
+//     console.log(i);
+//     if (i%2) {
+//         X.playRound('X');
+//     } else {
+//         O.playRound('O');
+//     }
+// }
+// }
+}
 startGame();
 
+return {startGame, nextPlayer};
+
 })();
+
 
 
 
