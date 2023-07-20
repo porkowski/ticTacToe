@@ -29,10 +29,10 @@ const gameBoard = (() => {
 var playerFactory = function(moniker) {
 
     //function to indicate that ones' turn is completed
-    const finishedTurn = () => {
-        console.log('firing finished');
-        gameLogic.nextPlayer();
-    }
+     const finishedTurn = () => {
+         console.log('firing finished');
+         gameLogic.nextPlayer();
+     }
 
     const playRound = (moniker) => {
         let boardArray = gameBoard.getBoard();
@@ -43,18 +43,35 @@ var playerFactory = function(moniker) {
         //CONVERT NODELIST TO ARRAY TO USE ARRAY METHODS SUCH AS .indexOf
         const bPiecesArray = Array.from(boardPieces);
 
-        boardDom.addEventListener("click", (event)=>{
-           const boxClickedIndex = bPiecesArray.indexOf(event.target);
-           const clickedDiv = boardPieces[boxClickedIndex];
-            //ONLY ADD 'X' OR 'O' IF THERE IS CURRENTLY NOBODY ON A BOX
-           if ((boardArray[boxClickedIndex]=='')) {
-              clickedDiv.setAttribute("id",moniker);
-              boardArray.splice(boxClickedIndex,1,moniker);
-              finishedTurn();
-           return boardArray;
-           };
+        //Create named function for event listener below
+        function clicked(event) {
+            const boxClickedIndex = bPiecesArray.indexOf(event.target);
+            const clickedDiv = boardPieces[boxClickedIndex];
+             //ONLY ADD 'X' OR 'O' IF THERE IS CURRENTLY NOBODY ON A BOX
+            if ((boardArray[boxClickedIndex]=='')) {
+               clickedDiv.setAttribute("id",moniker);
+               boardArray.splice(boxClickedIndex,1,moniker);
+               finishedTurn();
+            return boardArray;
+            };
+        }
+
+        boardDom.addEventListener("click", () => {
+            clicked(event);
+            console.log("clicked");
+            },{once:true});
+        //    const boxClickedIndex = bPiecesArray.indexOf(event.target);
+        //    const clickedDiv = boardPieces[boxClickedIndex];
+        //     //ONLY ADD 'X' OR 'O' IF THERE IS CURRENTLY NOBODY ON A BOX
+        //    if ((boardArray[boxClickedIndex]=='')) {
+        //       clickedDiv.setAttribute("id",moniker);
+        //       boardArray.splice(boxClickedIndex,1,moniker);
+        //       finishedTurn();
+        //    return boardArray;
+        //    };
+        
            
-    },{once:true});
+
  }
     return {playRound, moniker};
 
@@ -84,17 +101,20 @@ const startGame = () => {
 }
 
 const nextPlayer = () => {
-O.playRound('O')
-//Alternate between O and X 
-// for (let i=1; i<10; i++) {
-//     console.log(i);
-//     if (i%2) {
-//         X.playRound('X');
-//     } else {
-//         O.playRound('O');
-//     }
-// }
-// }
+
+let counter = 2;
+console.log(counter);
+//Why is below not working
+if (counter%2 == false) {
+    X.playRound('X');
+    counter++;
+    return counter;
+} else {
+    O.playRound('O');
+    counter++;
+    return counter;
+}
+
 }
 startGame();
 
@@ -130,3 +150,4 @@ return {startGame, nextPlayer};
 // The Game might tell the DisplayController "hey, let me know the index of a clicked cell, 'kay?" And when it does, the Game might look at itself to see who the current player is, and then turn around and ask the Gameboard (the state) "Hey, can you place this person at this index?"
 
 // The whole project becomes a conversation between parts, orchestrated by an overseeing Game.
+
