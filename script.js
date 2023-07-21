@@ -19,19 +19,17 @@ const gameBoard = (() => {
 
 var playerFactory = function(moniker) {
 
-    //function to indicate that ones' turn is completed
-     const finishedTurn = () => {
-         gameLogic.nextPlayer();
-     }
+
 
     const playRound = (moniker) => {
         let boardArray = gameBoard.getBoard();
         //GRAB DOM ELEMENTS FROM gameBoard()
         const boardPieces= gameBoard.$pieces;
         const boardDom = gameBoard.$board;
-
+        //Node list of empty boxes
+        const emptyPieces = boardDom.querySelectorAll(".empty");
         //ONLY LISTEN TO BOXES WITHOUT AN ID
-   console.log(boardDom);
+
 
         //CONVERT NODELIST TO ARRAY TO USE ARRAY METHODS SUCH AS .indexOf
         const bPiecesArray = Array.from(boardPieces);
@@ -39,20 +37,26 @@ var playerFactory = function(moniker) {
 
         //Create named function for event listener below
         function clicked(event) {
-            console.log("clicked");
             const boxClickedIndex = bPiecesArray.indexOf(event.target);
             const clicked = event.target;
-             //ONLY ADD 'X' OR 'O' IF THERE IS CURRENTLY NOBODY ON A BOX
-            if ((boardArray[boxClickedIndex]=='')) {
-               clicked.setAttribute("id",moniker);
+               clicked.setAttribute("class",`boardPiece ${moniker}`);
                boardArray.splice(boxClickedIndex,1,moniker);
                finishedTurn();
-            } 
         }
 
-        boardDom.addEventListener("click", () => {
-            clicked(event);
-            },{once:true});
+         boardDom.addEventListener("click", (event) => {
+             const target = event.target;
+             if (target.getAttribute("class")=="boardPiece empty") {
+             clicked(event);
+             };
+             },{once:true});
+
+        
+        const finishedTurn = () => {
+           gameLogic.nextPlayer();
+        }
+
+        
            
  }
     return {playRound, moniker};
@@ -84,6 +88,9 @@ const nextPlayer = () => {
      }
 
 }
+
+//if the wrong element is clicked, redo playRound()
+
 startGame();
 
 return {nextPlayer};
@@ -92,8 +99,6 @@ return {nextPlayer};
 
 
 
-
-//Create instances of X and O
 
 
 

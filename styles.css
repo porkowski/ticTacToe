@@ -34,7 +34,7 @@ body{
 
 }
 
-#X::after {
+.X::after {
 position:absolute;
 content:url(x.svg);
 transform:scale(7);
@@ -43,7 +43,7 @@ left:83px;
 }
 
 
-#O::after {
+.O::after {
 position:absolute;
 content:url(circle.svg);
 transform:scale(5);
