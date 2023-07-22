@@ -22,6 +22,7 @@ var playerFactory = function(moniker) {
 
 
     const playRound = (moniker) => {
+        console.trace();
         let boardArray = gameBoard.getBoard();
         //GRAB DOM ELEMENTS FROM gameBoard()
         const boardPieces= gameBoard.$pieces;
@@ -42,7 +43,7 @@ var playerFactory = function(moniker) {
                clicked.setAttribute("class",`boardPiece ${moniker}`);
                boardArray.splice(boxClickedIndex,1,moniker);
                finishedTurn();
-        }
+        };
 
          boardDom.addEventListener("click", (event) => {
              const target = event.target;
@@ -54,10 +55,10 @@ var playerFactory = function(moniker) {
         
         const finishedTurn = () => {
            gameLogic.nextPlayer();
-        }
+        };
 
         
-           
+
  }
     return {playRound, moniker};
 
@@ -89,7 +90,6 @@ const nextPlayer = () => {
 
 }
 
-//if the wrong element is clicked, redo playRound()
 
 startGame();
 
