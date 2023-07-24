@@ -6,97 +6,102 @@ const gameBoard = (() => {
     //cache DOM
     const $board = document.querySelector('.gameBoard');
     const $pieces = document.querySelectorAll('.boardPiece');
+    const $turnAnnouncer = document.querySelector('.turnAnnouncer');
+    const $startButton = document.querySelector('.start1person');
 
     //allow other factory function/module to inherit board
     const getBoard = () => board;
 
-    return {getBoard, $board, $pieces,};
+
+    //Also, start game upon button click
+    $startButton.addEventListener("click", ()=> {
+        gameLogic.startGame();
+        $turnAnnouncer.innerHTML = `${X.moniker}'s turn!`
+    },{once:true});
+
+    const turnAnnounce = () => {
+        //Get counter # from gameLogic. Need locally scoped "counter" to determine whos turn it is.
+        let turn = gameLogic.count().counter;
+        if (turn%2) {
+            $turnAnnouncer.innerHTML = `${O.moniker}'s turn!`;
+        } else {
+            $turnAnnouncer.innerHTML = `${X.moniker}'s turn!`;
+        }
+    };
+
+
+    return {getBoard, $board, $pieces, turnAnnounce};
 })();;
 
 
 
 
-
-var playerFactory = function(moniker) {
-
-
-
-    const playRound = (moniker) => {
-        console.trace();
-        let boardArray = gameBoard.getBoard();
-        //GRAB DOM ELEMENTS FROM gameBoard()
-        const boardPieces= gameBoard.$pieces;
-        const boardDom = gameBoard.$board;
-        //Node list of empty boxes
-        const emptyPieces = boardDom.querySelectorAll(".empty");
-        //ONLY LISTEN TO BOXES WITHOUT AN ID
-
-
-        //CONVERT NODELIST TO ARRAY TO USE ARRAY METHODS SUCH AS .indexOf
-        const bPiecesArray = Array.from(boardPieces);
-
-
-        //Create named function for event listener below
-        function clicked(event) {
-            const boxClickedIndex = bPiecesArray.indexOf(event.target);
-            const clicked = event.target;
-               clicked.setAttribute("class",`boardPiece ${moniker}`);
-               boardArray.splice(boxClickedIndex,1,moniker);
-               finishedTurn();
-        };
-
-         boardDom.addEventListener("click", (event) => {
-             const target = event.target;
-             if (target.getAttribute("class")=="boardPiece empty") {
-             clicked(event);
-             };
-             },{once:true});
-
-        
-        const finishedTurn = () => {
-           gameLogic.nextPlayer();
-        };
-
-        
-
- }
-    return {playRound, moniker};
-
-}
-
+function playerFactory(moniker)  {
+return {moniker}
+};
 const X = playerFactory('X');
 const O = playerFactory('O');
 
 
 
+
 const gameLogic = (() => {
 
-const startGame = () => {
-    X.playRound('X');
-};
-
-//Define counter for alternation function below
-let counter = 2;
-
-const nextPlayer = () => {
-//Counter alternates players
-     if (counter%2) {
-         X.playRound('X');
-         counter++;
-     } else {
-         O.playRound('O');
-         counter ++;
-     }
-
-}
+    //GRAB DOM ELEMENTS FROM gameBoard()
+    let boardArray = gameBoard.getBoard();
+     const boardPieces= gameBoard.$pieces;
+     const boardDom = gameBoard.$board;
 
 
-startGame();
+    const startGame = () => {
+        
+        //CONVERT NODELIST TO ARRAY TO USE ARRAY METHODS SUCH AS .indexOf
+        const bPiecesArray = Array.from(boardPieces);
 
-return {nextPlayer};
+        //Create named function for event listener below
+        function clicked(event) {
+            count().counter;
+            //change HTML to who's turn it is
+            gameBoard.turnAnnounce();
+            count();
+            const boxClickedIndex = bPiecesArray.indexOf(event.target);
+            const clicked = event.target;
+            clicked.setAttribute("class",`boardPiece ${mon}`);
+            boardArray.splice(boxClickedIndex,1,mon);
+            winLoseTracker(boardArray);
+        };
 
+        
+         boardDom.addEventListener("click", (event) => {
+             const target = event.target;
+             while(target.getAttribute("class")=="boardPiece empty") {
+             clicked(event);
+             };
+             });
+           
+    };
+
+    //declare variables for counter function in clicked
+    let counter = '1';
+
+    const count = () => {
+        if (counter%2) {
+            mon = X.moniker;
+            counter++;
+        } else {
+            mon = O.moniker;
+            counter ++;
+        }
+        return{counter};
+    };
+
+    const winLoseTracker = (boardArray) => {
+        console.log(boardArray);
+    };
+
+    winLoseTracker();
+return{count, startGame};
 })();
-
 
 
 
