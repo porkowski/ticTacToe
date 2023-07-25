@@ -82,7 +82,7 @@ const gameLogic = (() => {
     };
 
     //declare variables for counter function in clicked
-    let counter = '1';
+    var counter = '1';
 
     const count = () => {
         if (counter%2) {
@@ -95,12 +95,30 @@ const gameLogic = (() => {
         return{counter};
     };
 
+
+    const column1 = boardArray.filter((element,index)=> {
+        if (index===0||index===3||index===6) {
+            return true;
+        }
+    });
+
+    //COLUMNS
+    console.log(column1);
+
+
+
     const winLoseTracker = (boardArray) => {
-        console.log(boardArray);
+        //ROWS 
+        //console.log(boardArray.slice(0,3));
+        //console.log(boardArray.slice(3,6));
+        //console.log(boardArray.slice(6,9));
+
+
+            
+
     };
 
-    winLoseTracker();
-return{count, startGame};
+return{count, startGame, column1, boardArray};
 })();
 
 
