@@ -96,29 +96,78 @@ const gameLogic = (() => {
     };
 
 
-    const column1 = boardArray.filter((element,index)=> {
-        if (index===0||index===3||index===6) {
-            return true;
-        }
-    });
-
-    //COLUMNS
-    console.log(column1);
-
-
 
     const winLoseTracker = (boardArray) => {
-        //ROWS 
-        //console.log(boardArray.slice(0,3));
-        //console.log(boardArray.slice(3,6));
-        //console.log(boardArray.slice(6,9));
+        //Create arrays of each possible "win line"
+        //Rows
+        row1 = boardArray.slice(0,3);
+        row2 = boardArray.slice(3,6);
+        row3 = boardArray.slice(6,9);
 
-
+        //Columns
+         column1 = boardArray.filter((element,index)=> {
+            if (index===0||index===3||index===6) {
+                return true;
+            }
             
+        });
+
+        column2 = boardArray.filter((element,index)=> {
+            if (index===1||index===4||index===7) {
+                return true;
+            }
+            
+        });
+
+        column3 = boardArray.filter((element,index)=> {
+            if (index===2||index===5||index===8) {
+                return true;
+            }
+            
+        });
+
+        //Diagonals
+        diagonal1 = boardArray.filter((element,index)=> {
+            if (index===0||index===4||index===8) {
+                return true;
+            }
+            
+        });
+
+        diagonal2 = boardArray.filter((element,index)=> {
+            if (index===2||index===4||index===6) {
+                return true;
+            }
+            
+        });
+
+
+        //Check that every element is equal to the first element, but NOT default ''
+        const isEqual = (element,index,array) => (element == array[0] && element !== '');
+
+        //Declare method to check for tie, AKA is every box possible either an X or an O
+        const sTie = boardArray.every(element => (element =="X"||element=="O"));
+
+        //Iterate over each solution. Once a value of true is returned, stop the game.
+        const solutions = [diagonal1,diagonal2,column1,column2,column3,row1,row2,row3];
+        solutions.forEach((solution)=> {
+            
+            if (solution.every(isEqual)) {
+                var winner = solution[0];
+                endGame(winner);
+            };
+        });
+
+        //Check for tie
+        if (sTie) {alert('tie')};
 
     };
 
-return{count, startGame, column1, boardArray};
+    const endGame = (moniker) => {
+        alert(`Winner is ${moniker}`);
+    }
+
+return{count, startGame,boardArray};
 })();
 
 
