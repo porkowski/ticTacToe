@@ -19,12 +19,17 @@ const gameBoard = (() => {
         $turnAnnouncer.innerHTML = `${X.moniker}'s turn!`
     },{once:true});
 
-    const turnAnnounce = () => {
+    const turnAnnounce = (moniker) => {
+        console.trace();
         //Get counter # from gameLogic. Need locally scoped "counter" to determine whos turn it is.
         let turn = gameLogic.count().counter;
+        console.log(`${moniker} hello`);
         if (turn%2) {
             $turnAnnouncer.innerHTML = `${O.moniker}'s turn!`;
-        } else {
+        } else if (moniker == X) {
+            $turnAnnouncer.innerHTML = `${X.moniker} won!`;
+            return;
+        }    else {
             $turnAnnouncer.innerHTML = `${X.moniker}'s turn!`;
         }
     };
@@ -159,12 +164,17 @@ const gameLogic = (() => {
         });
 
         //Check for tie
-        if (sTie) {alert('tie')};
+        if (sTie) {(console.log('tie'))};
 
     };
 
+
     const endGame = (moniker) => {
-        alert(`Winner is ${moniker}`);
+        boardArray = ['','','','','','','','',''];
+        boardPieces.forEach(piece => {
+            piece.setAttribute('class','boardPiece empty');
+        });
+        gameBoard.turnAnnounce(moniker);
     }
 
 return{count, startGame,boardArray};
