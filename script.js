@@ -14,20 +14,31 @@ const gameBoard = (() => {
 
 
     //Also, start game upon button click
+    
+    //If every piece in boardArray is empty (i.e new game or ended game)
+    //restart the board
     $startButton.addEventListener("click", ()=> {
-        gameLogic.startGame();
-        $turnAnnouncer.innerHTML = `${X.moniker}'s turn!`
-    },{once:true});
+        if (board.every(element => element == '')) {
+            $pieces.forEach(piece => {
+                piece.setAttribute('class','boardPiece empty');
+            });
+            gameLogic.startGame();
+            $turnAnnouncer.innerHTML = `${X.moniker}'s turn!`
+            $startButton.innerHTML= '';
+        };
+    });
 
     const turnAnnounce = (moniker) => {
-        console.trace();
         //Get counter # from gameLogic. Need locally scoped "counter" to determine whos turn it is.
         let turn = gameLogic.count().counter;
-        console.log(`${moniker} hello`);
-        if (turn%2) {
+        //Initially, check if turnAnnounce is call with "moniker",
+        //Which comes from endGame()
+        if (moniker == 'X'|| moniker == "O") {
+            $turnAnnouncer.innerHTML = `${moniker} won!`;
+         } else if (moniker == 'tie') {
+             $turnAnnouncer.innerHTML = 'Its a tie!';
+         } else if (turn%2) {
             $turnAnnouncer.innerHTML = `${O.moniker}'s turn!`;
-        } else if (moniker == X) {
-            $turnAnnouncer.innerHTML = `${X.moniker} won!`;
             return;
         }    else {
             $turnAnnouncer.innerHTML = `${X.moniker}'s turn!`;
@@ -35,7 +46,7 @@ const gameBoard = (() => {
     };
 
 
-    return {getBoard, $board, $pieces, turnAnnounce};
+    return {getBoard, $board, $pieces, turnAnnounce, $startButton, $turnAnnouncer};
 })();;
 
 
@@ -56,7 +67,7 @@ const gameLogic = (() => {
     let boardArray = gameBoard.getBoard();
      const boardPieces= gameBoard.$pieces;
      const boardDom = gameBoard.$board;
-
+     const turnAnnouncer = gameBoard.$turnAnnouncer;
 
     const startGame = () => {
         
@@ -79,7 +90,9 @@ const gameLogic = (() => {
         
          boardDom.addEventListener("click", (event) => {
              const target = event.target;
-             while(target.getAttribute("class")=="boardPiece empty") {
+             //While piece is empty && the word "turn" is displayed, i.e nobody won
+             //nor is there a tied game
+             while(target.getAttribute("class")=="boardPiece empty" && turnAnnouncer.innerHTML.includes('turn')) {
              clicked(event);
              };
              });
@@ -160,24 +173,27 @@ const gameLogic = (() => {
             if (solution.every(isEqual)) {
                 var winner = solution[0];
                 endGame(winner);
+            } else if (sTie) {
+                endGame('tie');
             };
         });
-
-        //Check for tie
-        if (sTie) {(console.log('tie'))};
 
     };
 
 
     const endGame = (moniker) => {
-        boardArray = ['','','','','','','','',''];
-        boardPieces.forEach(piece => {
-            piece.setAttribute('class','boardPiece empty');
-        });
         gameBoard.turnAnnounce(moniker);
-    }
+        resetBoard();
+        gameBoard.$startButton.innerHTML = '<button>Restart Game</button>';
+        gameBoard.$startButton.setAttribute('class','start1person restart');
 
-return{count, startGame,boardArray};
+    };
+
+
+    const resetBoard = () => {
+        boardArray.splice(0,9,'','','','','','','','','');
+    }
+return{count, startGame,boardArray, resetBoard};
 })();
 
 

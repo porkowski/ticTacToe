@@ -20,17 +20,18 @@ button{
     border-radius:5px;
 }
 
-button:hover {
+.start1person button:hover {
     box-shadow:2px 2px 2px rgb(0, 193, 241);
     cursor:pointer;
 }
 
-button:active{
+
+.start1person .restart button:active{
     cursor:pointer;
     box-shadow:none;
     transform:translate(2px,2px);
-
 }
+
 
 .gameBoard {
     display:grid;
@@ -56,7 +57,6 @@ button:active{
     justify-self:center;
     align-self:end;
 }
-
 
 
 .boardPiece {
