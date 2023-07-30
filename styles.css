@@ -95,3 +95,23 @@ top:95px;
 left:83px;
 }
 
+.form {
+grid-column:1/4;
+justify-self: center;
+margin-right:22px;
+display:grid;
+grid-template-rows:50px 50px;
+}
+
+input[type="text"] {
+    appearance:none;
+    border:solid 2px rgba(0, 138, 85, 0.708);
+    border-radius:10px;
+    padding:5px;
+    outline:none;
+    color:rgb(0, 117, 128);
+}
+
+.hidden {
+    visibility:hidden;
+}

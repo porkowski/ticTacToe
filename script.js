@@ -1,20 +1,44 @@
+function playerFactory(moniker,name)  {
+
+    return {moniker,name}
+    };
+
+//Create X and O with monikers to start the game. 
+//Names for each player added later.
+const X = playerFactory('X');
+const O = playerFactory('O');
+
 const gameBoard = (() => {
 
     //board array to be 9 items (3x3 grid)
-    var board =['','','','','','','','',''];
+    let board =['','','','','','','','',''];
   
     //cache DOM
     const $board = document.querySelector('.gameBoard');
     const $pieces = document.querySelectorAll('.boardPiece');
     const $turnAnnouncer = document.querySelector('.turnAnnouncer');
     const $startButton = document.querySelector('.start1person');
+    const $form = document.querySelector('.form');
+    const $player1 = document.querySelector('#player1');
+    const $player2 = document.querySelector('#player2');
 
     //allow other factory function/module to inherit board
     const getBoard = () => board;
 
 
     //Also, start game upon button click
+        //Only once, take form elements, create players, and hide form
+        $startButton.addEventListener("click", ()=> {
+            $form.setAttribute('class','hidden');
+            const player1name = $player1.value;
+            const player2name = $player2.value;
+            X.name=player1name;
+            O.name=player2name;
+        },{once:true});
+
     
+
+
     //If every piece in boardArray is empty (i.e new game or ended game)
     //restart the board
     $startButton.addEventListener("click", ()=> {
@@ -23,40 +47,37 @@ const gameBoard = (() => {
                 piece.setAttribute('class','boardPiece empty');
             });
             gameLogic.startGame();
-            $turnAnnouncer.innerHTML = `${X.moniker}'s turn!`
+            $turnAnnouncer.innerHTML = `${X.name}'s turn!`
             $startButton.innerHTML= '';
         };
     });
 
-    const turnAnnounce = (moniker) => {
+    const turnAnnounce = (moniker,name) => {
         //Get counter # from gameLogic. Need locally scoped "counter" to determine whos turn it is.
         let turn = gameLogic.count().counter;
         //Initially, check if turnAnnounce is call with "moniker",
         //Which comes from endGame()
         if (moniker == 'X'|| moniker == "O") {
-            $turnAnnouncer.innerHTML = `${moniker} won!`;
+            $turnAnnouncer.innerHTML = `${name} won!`;
          } else if (moniker == 'tie') {
              $turnAnnouncer.innerHTML = 'Its a tie!';
          } else if (turn%2) {
-            $turnAnnouncer.innerHTML = `${O.moniker}'s turn!`;
+            $turnAnnouncer.innerHTML = `${O.name}'s turn!`;
             return;
         }    else {
-            $turnAnnouncer.innerHTML = `${X.moniker}'s turn!`;
+            $turnAnnouncer.innerHTML = `${X.name}'s turn!`;
         }
     };
 
 
-    return {getBoard, $board, $pieces, turnAnnounce, $startButton, $turnAnnouncer};
+    return {getBoard, board, $board, $pieces, turnAnnounce, $startButton, $turnAnnouncer};
 })();;
 
 
 
 
-function playerFactory(moniker)  {
-return {moniker}
-};
-const X = playerFactory('X');
-const O = playerFactory('O');
+
+
 
 
 
@@ -64,7 +85,7 @@ const O = playerFactory('O');
 const gameLogic = (() => {
 
     //GRAB DOM ELEMENTS FROM gameBoard()
-    let boardArray = gameBoard.getBoard();
+    let boardArray = gameBoard.board;
      const boardPieces= gameBoard.$pieces;
      const boardDom = gameBoard.$board;
      const turnAnnouncer = gameBoard.$turnAnnouncer;
@@ -99,8 +120,8 @@ const gameLogic = (() => {
            
     };
 
-    //declare variables for counter function in clicked
-    var counter = '1';
+    //declare letiables for counter function in clicked
+    let counter = '1';
 
     const count = () => {
         if (counter%2) {
@@ -171,8 +192,13 @@ const gameLogic = (() => {
         solutions.forEach((solution)=> {
             
             if (solution.every(isEqual)) {
-                var winner = solution[0];
-                endGame(winner);
+                let moniker = solution[0];
+                if (moniker == 'X') {
+                    endGame(moniker,X.name);
+                } else if (winner == 'O') {
+                    endGame(moniker,O.name);
+                }
+
             } else if (sTie) {
                 endGame('tie');
             };
@@ -181,8 +207,8 @@ const gameLogic = (() => {
     };
 
 
-    const endGame = (moniker) => {
-        gameBoard.turnAnnounce(moniker);
+    const endGame = (moniker, name) => {
+        gameBoard.turnAnnounce(moniker,name );
         resetBoard();
         gameBoard.$startButton.innerHTML = '<button>Restart Game</button>';
         gameBoard.$startButton.setAttribute('class','start1person restart');
@@ -191,7 +217,8 @@ const gameLogic = (() => {
 
 
     const resetBoard = () => {
-        boardArray.splice(0,9,'','','','','','','','','');
+       boardArray.splice(0,9,'','','','','','','','','');
+
     }
 return{count, startGame,boardArray, resetBoard};
 })();
