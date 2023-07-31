@@ -36,7 +36,6 @@ const gameBoard = (() => {
             O.name=player2name;
         },{once:true});
 
-    
 
 
     //If every piece in boardArray is empty (i.e new game or ended game)
@@ -47,7 +46,7 @@ const gameBoard = (() => {
                 piece.setAttribute('class','boardPiece empty');
             });
             gameLogic.startGame();
-            $turnAnnouncer.innerHTML = `${X.name}'s turn!`
+            $turnAnnouncer.innerHTML = `${X.name}'s turn! (${X.moniker})`
             $startButton.innerHTML= '';
         };
     });
@@ -58,14 +57,14 @@ const gameBoard = (() => {
         //Initially, check if turnAnnounce is call with "moniker",
         //Which comes from endGame()
         if (moniker == 'X'|| moniker == "O") {
-            $turnAnnouncer.innerHTML = `${name} won!`;
+            $turnAnnouncer.innerHTML = `${name} (${moniker}) won!`;
          } else if (moniker == 'tie') {
              $turnAnnouncer.innerHTML = 'Its a tie!';
          } else if (turn%2) {
-            $turnAnnouncer.innerHTML = `${O.name}'s turn!`;
+            $turnAnnouncer.innerHTML = `${O.name}'s turn! (${O.moniker})`;
             return;
         }    else {
-            $turnAnnouncer.innerHTML = `${X.name}'s turn!`;
+            $turnAnnouncer.innerHTML = `${X.name}'s turn! (${X.moniker})`;
         }
     };
 
@@ -120,7 +119,7 @@ const gameLogic = (() => {
            
     };
 
-    //declare letiables for counter function in clicked
+    //declare for counter function in clicked
     let counter = '1';
 
     const count = () => {
@@ -186,21 +185,24 @@ const gameLogic = (() => {
 
         //Declare method to check for tie, AKA is every box possible either an X or an O
         const sTie = boardArray.every(element => (element =="X"||element=="O"));
-
+        
         //Iterate over each solution. Once a value of true is returned, stop the game.
         const solutions = [diagonal1,diagonal2,column1,column2,column3,row1,row2,row3];
         solutions.forEach((solution)=> {
-            
+
             if (solution.every(isEqual)) {
                 let moniker = solution[0];
                 if (moniker == 'X') {
                     endGame(moniker,X.name);
-                } else if (winner == 'O') {
+                } else if (moniker == 'O') {
                     endGame(moniker,O.name);
                 }
-
-            } else if (sTie) {
-                endGame('tie');
+        //Check if there is a tie. If there is, need to include an && 
+        //operator to only fire off the endGame function ONCE.
+        //This is because this if/else conditional is within an array loop
+            } else if (sTie && solution == solutions[0]) {
+                    let moniker = 'tie';
+                    endGame(moniker);
             };
         });
 
