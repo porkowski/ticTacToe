@@ -8,7 +8,7 @@
 </head>
 <body>
     
-    <div class="gameBoard">
+    <div class="gameBoard hidden">
         <div class="turnAnnouncer">Input player names and start game below!</div>
         <div class="boardPiece empty"></div>
         <div class="boardPiece empty"></div>
@@ -21,17 +21,29 @@
         <div class="boardPiece empty"></div>
         <div class="start1person"><button>Start Game</button></div>
         <div class="form">
-            <div>
-                <label for="player1">Player 1 name:</label>
-                <input type="text" id="player1" name="player1" placeholder="Jimmy">
-            </div>
-            <div>
-                <label for="player2">Player 2 name:</label>
-                <input type="text" id="player2" name="player2" placeholder="Bobby">
-            </div>
+        <div>
+            <label for="player1">Player 1 name:</label>
+            <input type="text" id="player1" name="player1" placeholder="Jimmy">
+        </div>
+        <div class="player2name">
+            <label for="player2">Player 2 name:</label>
+            <input type="text" id="player2" name="player2" placeholder="Bobby">
+        </div>
+
     </div>
-
-
+    </div>
+    <div class="gameSelect">
+        <h2>Select a game mode below!</h2>
+        <div class="selectContainer">
+            <div>
+                <label for="humans">Human vs. Human</label>
+                <input type="radio" id="humans" value="humans" name="gameSelect">
+            </div>
+            <div>
+                <label for="AI">Human vs. AI</label>
+                <input type="radio" id="AI" value="AI" name="gameSelect">
+            </div>
+        </div>
     </div>
 
     
