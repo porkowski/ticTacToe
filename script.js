@@ -41,7 +41,7 @@ const gameBoard = (() => {
     //allow other factory function/module to inherit board
     const getBoard = () => board;
 
-
+    
     //cache DOM
     $board = gameModeSelector.$board;
     const $pieces = document.querySelectorAll('.boardPiece');
@@ -56,6 +56,8 @@ const gameBoard = (() => {
         //restart the board. Also take usernames from forms and use as player
         //names
         $startButton.addEventListener("click", ()=> {
+        //IF GAMEMODE IS HUMAN VS HUMAN (THIS WAS THE ORIGINAL CODE)
+        if (gameModeSelector.gameModeSelected() == 'humans') {
             if ((board.every(element => element == '') && $player1.value != '' && $player2.value != '')) {
                 $form.setAttribute('class','hidden');
                 const player1name = $player1.value;
@@ -78,7 +80,25 @@ const gameBoard = (() => {
             } else if ($player2.value =='') {
                 $player2.setAttribute('id','redOutline');
             };
-        });
+        //IF GAMEMODE IS HUMAN VS AI (NEW CODE)
+        } else if (gameModeSelector.gameModeSelected() == 'AI') {
+            if ((board.every(element => element == '') && $player1.value != '')) {
+                $form.setAttribute('class','hidden');
+                const player1name = $player1.value;
+                const player2name = 'AI';
+                X.name=player1name;
+                O.name=player2name;
+            
+                $pieces.forEach(piece => {
+                    piece.setAttribute('class','boardPiece empty');
+                });
+                gameLogic.startGameAI();
+                $turnAnnouncer.innerHTML = `${X.name}'s turn! (${X.moniker})`
+                $startButton.innerHTML= '';
+            } else if ($player1.value == '' ) {
+                $player1.setAttribute('id','redOutline');
+            };
+        }});
   
         function turnAnnounce (moniker,name) {
             //Get counter # from gameLogic. Need locally scoped "counter" to determine whos turn it is.
@@ -97,13 +117,29 @@ const gameBoard = (() => {
             }
         };
 
+        function turnAnnounceAI (moniker,name) {
 
-    return {getBoard, board, $pieces, turnAnnounce, $startButton, $turnAnnouncer};
+            //Initially, check if turnAnnounce is called with "moniker",
+            //Which comes from endGame()
+            if (moniker == 'X'|| moniker == "O") {
+                $turnAnnouncer.innerHTML = `${name} (${moniker}) won!`;
+            } else if (moniker == 'tie') {
+                $turnAnnouncer.innerHTML = 'Its a tie!';
+            } else {
+                $turnAnnouncer.innerHTML = `${X.name}'s turn! (${X.moniker})`;
+
+            };
+        };
+
+
+
+
+    return {getBoard, board, $pieces, turnAnnounce, turnAnnounceAI,$startButton, $turnAnnouncer};
 })();;
 
+
+
 const gameLogic = (() => {
-
-
 
     //GRAB DOM ELEMENTS FROM gameBoard()
      let boardArray = gameBoard.board;
@@ -142,6 +178,105 @@ const gameLogic = (() => {
             
         };
 
+        const startGameAI = () => {
+            
+            //CONVERT NODELIST TO ARRAY TO USE ARRAY METHODS SUCH AS .indexOf
+            const bPiecesArray = Array.from(boardPieces);
+
+            //Create named function for event listener below
+            function clicked(event) {
+
+                //change HTML to who's turn it is
+                gameBoard.turnAnnounceAI();
+                const boxClickedIndex = bPiecesArray.indexOf(event.target);
+                const clicked = event.target;
+                clicked.setAttribute("class",`boardPiece X`);
+                boardArray.splice(boxClickedIndex,1,'X');
+
+                //AI's turn
+                //Grab index values of boardArray that are empty & choose a random one.
+                const usedIndeces = [];
+                boardArray.forEach((element,index) => {if (element == '') usedIndeces.push(index) });
+                if (usedIndeces.length >1) {
+                const randomIndex = usedIndeces[Math.floor(Math.random()*usedIndeces.length)];
+                boardArray.splice(randomIndex,1,'O');
+                bPiecesArray[randomIndex].setAttribute("class",'boardPiece O');
+                };
+                winLoseTracker(boardArray);
+
+            };
+
+            
+
+            
+            boardDom.addEventListener("click", (event) => {
+                const target = event.target;
+                //While piece is empty && the word "turn" is displayed, i.e nobody won
+                //nor is there a tied game
+                while(target.getAttribute("class")=="boardPiece empty" && turnAnnouncer.innerHTML.includes('turn')) {
+                clicked(event);
+                };
+                });
+            
+        };
+
+        const startGameAIhard = () => {
+            
+            //CONVERT NODELIST TO ARRAY TO USE ARRAY METHODS SUCH AS .indexOf
+            const bPiecesArray = Array.from(boardPieces);
+
+            //Create named function for event listener below
+            function clicked(event) {
+
+                //change HTML to who's turn it is
+                gameBoard.turnAnnounceAI();
+                const boxClickedIndex = bPiecesArray.indexOf(event.target);
+                const clicked = event.target;
+                clicked.setAttribute("class",`boardPiece X`);
+                boardArray.splice(boxClickedIndex,1,'X');
+
+                //AI's turn
+
+                const AIhardmove = (index) => {
+                    boardArray.splice(index,1,'O');
+                    bPiecesArray[index].setAttribute("class",'boardPiece O');
+                    winLoseTracker(boardArray);
+                };
+
+                const solutions = winLoseTracker(boardArray).solutions;
+                solutions.every((solution,index) => {
+                    //change to if solution includes TWO O's
+                    if (!solution.includes('X') && solution.includes('O')) {
+                        AIhardmove(index);
+                        return true;
+                    //change to if solution doesnt include X but includes O
+                    } else if (solution.includes('O')) {
+                        AIhardmove(index);
+                        return true;
+                    } else if (!solution.includes('X')) {
+                        AIhardmove(index);
+                        return true;
+                    };
+                })
+                console.log(boardArray);
+
+            };
+
+            
+
+            
+            boardDom.addEventListener("click", (event) => {
+                const target = event.target;
+                //While piece is empty && the word "turn" is displayed, i.e nobody won
+                //nor is there a tied game
+                while(target.getAttribute("class")=="boardPiece empty" && turnAnnouncer.innerHTML.includes('turn')) {
+                clicked(event);
+                };
+                });
+            
+        };
+
+
         //declare for counter function in clicked
         let counter = '1';
 
@@ -159,6 +294,7 @@ const gameLogic = (() => {
 
 
         const winLoseTracker = (boardArray) => {
+            console.log(boardArray);
             //Create arrays of each possible "win line"
             //Rows
             row1 = boardArray.slice(0,3);
@@ -227,8 +363,10 @@ const gameLogic = (() => {
                         let moniker = 'tie';
                         endGame(moniker);
                 };
-            });
 
+                
+            });
+            return {solutions};
         };
 
 
@@ -244,6 +382,6 @@ const gameLogic = (() => {
         }
     
 
-return{count, startGame,boardArray, resetBoard};
+return{count, startGame, startGameAI, startGameAIhard, boardArray, resetBoard};
 })();
 
