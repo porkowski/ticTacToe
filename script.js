@@ -92,7 +92,7 @@ const gameBoard = (() => {
                 $pieces.forEach(piece => {
                     piece.setAttribute('class','boardPiece empty');
                 });
-                gameLogic.startGameAI();
+                gameLogic.startGameAIhard();
                 $turnAnnouncer.innerHTML = `${X.name}'s turn! (${X.moniker})`
                 $startButton.innerHTML= '';
             } else if ($player1.value == '' ) {
@@ -227,7 +227,7 @@ const gameLogic = (() => {
 
             //Create named function for event listener below
             function clicked(event) {
-
+                
                 //change HTML to who's turn it is
                 gameBoard.turnAnnounceAI();
                 const boxClickedIndex = bPiecesArray.indexOf(event.target);
@@ -243,27 +243,95 @@ const gameLogic = (() => {
                     winLoseTracker(boardArray);
                 };
 
+                //Find first empty index in a winnin line for O
+                const findEmptyWinIndex = (mainindex) => {
+                    console.trace();
+                    if (mainindex == 0) {
+                        boardArray.find((element,index)=> {
+                            if (element == '' && (index == 0 || index == 4 || index == 8)) {
+                                console.log('found');
+                                AIhardmove(index); 
+                                return true;
+                            }}
+                        )
+                    } else if (mainindex == 1) {
+                        boardArray.find((element,index)=> {
+                            if (element == '' && (index == 2 || index == 4 || index == 6)) {
+                                AIhardmove(index); 
+                                return true;
+                            }}
+                        )
+                    } else if (mainindex == 2) {
+                        boardArray.find((element,index)=> {
+                            if (element == '' && (index == 0 || index == 3 || index == 6)) {
+                                AIhardmove(index); 
+                                return true;
+                            }}
+                        )
+                    } 
+                    else if (mainindex == 3) {
+                        boardArray.find((element,index)=> {
+                            if (element == '' && (index == 1 || index == 4 || index == 7)) {
+                                AIhardmove(index); 
+                                return true;
+                            }}
+                        )
+                    }
+                    else if (mainindex == 4) {
+                        boardArray.find((element,index)=> {
+                            if (element == '' && (index == 2 || index == 5 || index == 8)) {
+                                AIhardmove(index); 
+                                return true;
+                            }}
+                        )
+                    }
+                    else if (mainindex == 5) {
+                        boardArray.find((element,index)=> {
+                            if (element == '' && (index == 0 || index == 1 || index == 2)) {
+                                AIhardmove(index); 
+                                return true;
+                            }}
+                        )
+                    }else if (mainindex == 6) {
+                        boardArray.find((element,index)=> {
+                            if (element == '' && (index == 3 || index == 4 || index == 5)) {
+                                AIhardmove(index); 
+                                return true;
+                            }}
+                        )
+                    }
+                    else if (mainindex == 7) {
+                        boardArray.find((element,index)=> {
+                            if (element == '' && (index == 6 || index == 7 || index == 8)) {
+                                AIhardmove(index); 
+                                return true;
+                            }}
+                        )
+                    }
+
+                }; 
+
+                
+                //grab solutions from below
                 const solutions = winLoseTracker(boardArray).solutions;
-                solutions.every((solution,index) => {
-                    //change to if solution includes TWO O's
-                    if (!solution.includes('X') && solution.includes('O')) {
-                        AIhardmove(index);
-                        return true;
-                    //change to if solution doesnt include X but includes O
-                    } else if (solution.includes('O')) {
-                        AIhardmove(index);
-                        return true;
-                    } else if (!solution.includes('X')) {
-                        AIhardmove(index);
-                        return true;
-                    };
-                })
-                console.log(boardArray);
 
+                if (boardArray[4] =='') {
+                    AIhardmove(4);
+                } else {
+                //Find first possible solution
+                solutions.findIndex((solution,index)=> {
+                    if (solution.toString() == "O,,O" || solution.toString() == "O,O," || solution.toString()== ",,O,O") {
+                        findEmptyWinIndex(index);
+                        return true;
+                    }   else if (!solution.includes('X') && solution.includes('O')) {
+                        findEmptyWinIndex(index);
+                        return true;
+                    }
+                }
+                )
+            }
             };
-
             
-
             
             boardDom.addEventListener("click", (event) => {
                 const target = event.target;
@@ -294,7 +362,6 @@ const gameLogic = (() => {
 
 
         const winLoseTracker = (boardArray) => {
-            console.log(boardArray);
             //Create arrays of each possible "win line"
             //Rows
             row1 = boardArray.slice(0,3);
