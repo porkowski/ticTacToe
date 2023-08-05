@@ -3,6 +3,9 @@
     src: url(FiraSans-Regular.ttf);
 }
 
+@media screen {
+    
+}
 body{
     background-color:mediumspringgreen;
     height:100%;

@@ -245,11 +245,9 @@ const gameLogic = (() => {
 
                 //Find first empty index in a winnin line for O
                 const findEmptyWinIndex = (mainindex) => {
-                    console.trace();
                     if (mainindex == 0) {
                         boardArray.find((element,index)=> {
                             if (element == '' && (index == 0 || index == 4 || index == 8)) {
-                                console.log('found');
                                 AIhardmove(index); 
                                 return true;
                             }}
@@ -317,7 +315,9 @@ const gameLogic = (() => {
 
                 if (boardArray[4] =='') {
                     AIhardmove(4);
-                } else {
+                } else if (boardArray[4] == 'X' && boardArray[0]=='') {
+                    AIhardmove(0);
+                } else    {
                 //Find first possible solution
                 solutions.findIndex((solution,index)=> {
                     if (solution.toString() == "O,,O" || solution.toString() == "O,O," || solution.toString()== ",,O,O") {
@@ -362,6 +362,7 @@ const gameLogic = (() => {
 
 
         const winLoseTracker = (boardArray) => {
+            console.log(boardArray);
             //Create arrays of each possible "win line"
             //Rows
             row1 = boardArray.slice(0,3);
