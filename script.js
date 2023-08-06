@@ -59,6 +59,7 @@ const gameBoard = (() => {
         //IF GAMEMODE IS HUMAN VS HUMAN (THIS WAS THE ORIGINAL CODE)
         if (gameModeSelector.gameModeSelected() == 'humans') {
             if ((board.every(element => element == '') && $player1.value != '' && $player2.value != '')) {
+                let turn = gameLogic.countV();
                 $form.setAttribute('class','hidden');
                 const player1name = $player1.value;
                 const player2name = $player2.value;
@@ -69,7 +70,11 @@ const gameBoard = (() => {
                     piece.setAttribute('class','boardPiece empty');
                 });
                 gameLogic.startGame();
-                $turnAnnouncer.innerHTML = `${X.name}'s turn! (${X.moniker})`
+                    if (turn%2) {
+                    $turnAnnouncer.innerHTML = `${X.name}'s turn! (${X.moniker})`
+                    } else {
+                    $turnAnnouncer.innerHTML = `${O.name}'s turn! (${O.moniker})`                        
+                    }
                 $startButton.innerHTML= '';
             } else if ($player1.value == '' && $player2.value =='') {
                 $player1.setAttribute('id','redOutline');
@@ -102,7 +107,8 @@ const gameBoard = (() => {
   
         function turnAnnounce (moniker,name) {
             //Get counter # from gameLogic. Need locally scoped "counter" to determine whos turn it is.
-            let turn = gameLogic.count().counter;
+            let turn = gameLogic.countV();
+            console.log(moniker);
             //Initially, check if turnAnnounce is called with "moniker",
             //Which comes from endGame()
             if (moniker == 'X'|| moniker == "O") {
@@ -141,6 +147,10 @@ const gameBoard = (() => {
 
 const gameLogic = (() => {
 
+    //declare for counter function in clicked
+    let counter = '1';
+    const countV = () => counter;
+
     //GRAB DOM ELEMENTS FROM gameBoard()
      let boardArray = gameBoard.board;
      const boardPieces= gameBoard.$pieces;
@@ -155,7 +165,6 @@ const gameLogic = (() => {
 
             //Create named function for event listener below
             function clicked(event) {
-                count().counter;
                 //change HTML to who's turn it is
                 gameBoard.turnAnnounce();
                 count();
@@ -345,24 +354,23 @@ const gameLogic = (() => {
         };
 
 
-        //declare for counter function in clicked
-        let counter = '1';
+
 
         const count = ()=>{
             if (counter%2) {
                 mon = X.moniker;
                 counter++;
             } else {
+                console.log('O');
                 mon = O.moniker;
                 counter ++;
             }
-            return{counter};
+            //return{counter};
         };
 
 
 
         const winLoseTracker = (boardArray) => {
-            console.log(boardArray);
             //Create arrays of each possible "win line"
             //Rows
             row1 = boardArray.slice(0,3);
@@ -450,6 +458,6 @@ const gameLogic = (() => {
         }
     
 
-return{count, startGame, startGameAI, startGameAIhard, boardArray, resetBoard};
+return{count, startGame, startGameAI, startGameAIhard, boardArray, resetBoard,countV};
 })();
 
