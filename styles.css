@@ -173,7 +173,7 @@ input[type="text"] {
 
 @media (width<=800px) {
     body{
-        background-color:red;
+        background-color:mediumspringgreen;
         font-family:FiraSans;
         position:relative;
     }
