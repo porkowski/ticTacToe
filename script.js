@@ -108,7 +108,6 @@ const gameBoard = (() => {
         function turnAnnounce (moniker,name) {
             //Get counter # from gameLogic. Need locally scoped "counter" to determine whos turn it is.
             let turn = gameLogic.countV();
-            console.log(moniker);
             //Initially, check if turnAnnounce is called with "moniker",
             //Which comes from endGame()
             if (moniker == 'X'|| moniker == "O") {
@@ -195,6 +194,7 @@ const gameLogic = (() => {
             //Create named function for event listener below
             function clicked(event) {
 
+    
                 //change HTML to who's turn it is
                 gameBoard.turnAnnounceAI();
                 const boxClickedIndex = bPiecesArray.indexOf(event.target);
@@ -234,41 +234,56 @@ const gameLogic = (() => {
             //CONVERT NODELIST TO ARRAY TO USE ARRAY METHODS SUCH AS .indexOf
             const bPiecesArray = Array.from(boardPieces);
 
+            //Reset turn upon game start
+            count();
             //Create named function for event listener below
             function clicked(event) {
-                
+                let turn = gameLogic.countV();
                 //change HTML to who's turn it is
                 gameBoard.turnAnnounceAI();
+
+
+                const humanmove = () => {
                 const boxClickedIndex = bPiecesArray.indexOf(event.target);
                 const clicked = event.target;
                 clicked.setAttribute("class",`boardPiece X`);
                 boardArray.splice(boxClickedIndex,1,'X');
+                };
 
                 //AI's turn
-
                 const AIhardmove = (index) => {
                     boardArray.splice(index,1,'O');
                     bPiecesArray[index].setAttribute("class",'boardPiece O');
                     winLoseTracker(boardArray);
                 };
 
+                //First maneuvers
+                const firstAImoves = () => {
+                if (boardArray[4] =='') {
+                        AIhardmove(4);
+                    } else if (boardArray[4] == 'X' && boardArray[0]=='') {
+                        AIhardmove(0);
+                    };
+                };
+
+
                 //Find first empty index in a winnin line for O
-                const findEmptyWinIndex = (mainindex) => {
-                    if (mainindex == 0) {
+                const findEmptyWinIndex = (foundIndex) => {
+                    if (foundIndex == 0) {
                         boardArray.find((element,index)=> {
                             if (element == '' && (index == 0 || index == 4 || index == 8)) {
-                                AIhardmove(index); 
+                                    AIhardmove(index); 
                                 return true;
                             }}
                         )
-                    } else if (mainindex == 1) {
+                    } else if (foundIndex == 1) {
                         boardArray.find((element,index)=> {
-                            if (element == '' && (index == 2 || index == 4 || index == 6)) {
+                            if (element == '' && (index == 2 || index == 4 || index == 6)) {     
                                 AIhardmove(index); 
                                 return true;
                             }}
                         )
-                    } else if (mainindex == 2) {
+                    } else if (foundIndex == 2) {
                         boardArray.find((element,index)=> {
                             if (element == '' && (index == 0 || index == 3 || index == 6)) {
                                 AIhardmove(index); 
@@ -276,7 +291,7 @@ const gameLogic = (() => {
                             }}
                         )
                     } 
-                    else if (mainindex == 3) {
+                    else if (foundIndex == 3) {
                         boardArray.find((element,index)=> {
                             if (element == '' && (index == 1 || index == 4 || index == 7)) {
                                 AIhardmove(index); 
@@ -284,7 +299,7 @@ const gameLogic = (() => {
                             }}
                         )
                     }
-                    else if (mainindex == 4) {
+                    else if (foundIndex == 4) {
                         boardArray.find((element,index)=> {
                             if (element == '' && (index == 2 || index == 5 || index == 8)) {
                                 AIhardmove(index); 
@@ -292,14 +307,14 @@ const gameLogic = (() => {
                             }}
                         )
                     }
-                    else if (mainindex == 5) {
+                    else if (foundIndex == 5) {
                         boardArray.find((element,index)=> {
                             if (element == '' && (index == 0 || index == 1 || index == 2)) {
                                 AIhardmove(index); 
                                 return true;
                             }}
                         )
-                    }else if (mainindex == 6) {
+                    }else if (foundIndex == 6) {
                         boardArray.find((element,index)=> {
                             if (element == '' && (index == 3 || index == 4 || index == 5)) {
                                 AIhardmove(index); 
@@ -307,7 +322,7 @@ const gameLogic = (() => {
                             }}
                         )
                     }
-                    else if (mainindex == 7) {
+                    else if (foundIndex == 7) {
                         boardArray.find((element,index)=> {
                             if (element == '' && (index == 6 || index == 7 || index == 8)) {
                                 AIhardmove(index); 
@@ -317,28 +332,68 @@ const gameLogic = (() => {
                     }
 
                 }; 
-
                 
-                //grab solutions from below
-                const solutions = winLoseTracker(boardArray).solutions;
 
-                if (boardArray[4] =='') {
-                    AIhardmove(4);
-                } else if (boardArray[4] == 'X' && boardArray[0]=='') {
-                    AIhardmove(0);
-                } else    {
-                //Find first possible solution
-                solutions.findIndex((solution,index)=> {
-                    if (solution.toString() == "O,,O" || solution.toString() == "O,O," || solution.toString()== ",,O,O") {
-                        findEmptyWinIndex(index);
-                        return true;
-                    }   else if (!solution.includes('X') && solution.includes('O')) {
-                        findEmptyWinIndex(index);
-                        return true;
+                const AIstringSearch = () => {
+                    //Check for 2nd turn
+                    let usedboxes = boardArray.filter(element => element !== '');
+                    if (usedboxes.length > 2) {
+                  
+                      //Find first possible solution. I split up into 3 findIndexes 
+                      //to better prioritize winlines.
+                      const bestIndex = solutions.findIndex((solution, index) => {
+                        if (solution.toString() == "X,,X" || solution.toString() == "X,X," || solution.toString() == ",X,X") {
+                          return true;
+                        };
+                      });
+                  
+                      if (bestIndex !== -1) return bestIndex // return the index now if bestIndex is found
+                  
+                      const midIndex = solutions.findIndex((solution, index) => {
+                        if (solution.toString() == "O,,O" || solution.toString() == "O,O," || solution.toString() == ",O,O") {
+                          return true;
+                        }
+                      });
+                  
+                      if (midIndex !== -1) return midIndex // return the index now if midIndex is found
+                  
+                      const worstIndex = solutions.findIndex((solution, index) => {
+                        if (!solution.includes('X') && solution.includes('O')) {
+                          return true;
+                        };
+                      });
+                  
+                      if(worstIndex !== -1) return worstIndex // return the index now if worstIndex is found
+                    
+                      const finalIndex = solutions.findIndex((solution, index) => {
+                          return true;         
+                      });
+
+                      if(finalIndex !== -1) return finalIndex // return the index now if finalIndex is found
+                    
+                    
                     }
-                }
-                )
-            }
+                  };
+                  
+
+                   
+                //Check turn for 'X' to start first or 'O'
+
+                    humanmove();
+                    firstAImoves();
+                    
+                //grab solutions from below
+                let solutions = winLoseTracker(boardArray).solutions;
+
+                    // make it return the index you want
+                    const foundIndex = AIstringSearch();
+                    console.log(foundIndex);
+                    // then pass it into the function you need the index in
+                    // could also make sure foundIndex isn't `undefined` before running findEmptyWinIndex
+                    findEmptyWinIndex(foundIndex);
+
+
+
             };
             
             
@@ -361,11 +416,9 @@ const gameLogic = (() => {
                 mon = X.moniker;
                 counter++;
             } else {
-                console.log('O');
                 mon = O.moniker;
                 counter ++;
             }
-            //return{counter};
         };
 
 
